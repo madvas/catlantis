@@ -1,0 +1,25 @@
+{
+  "name": "rnntest",
+  "interface": "reagent",
+  "androidHost": "10.0.3.2",
+  "iosHost": "localhost",
+  "envRoots": {
+    "dev": "env/dev",
+    "prod": "env/prod"
+  },
+  "modules": [
+    "react-native-controllers",
+    "react-native-navigation",
+    "react-native-extended-stylesheet",
+    "react-native-listitem",
+    "stream",
+    "xml2js",
+    "events",
+    "timers",
+    "buffer",
+    "react-native-image-progress"
+  ],
+  "imageDirs": [
+    "images"
+  ]
+}
