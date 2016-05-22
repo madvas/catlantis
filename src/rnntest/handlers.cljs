@@ -4,7 +4,6 @@
     [schema.core :as s :include-macros true]
     [print.foo :as pf :include-macros true]
     [rnntest.db :refer [app-db schema]]
-    [rnntest.schemas :as sch]
     [rnntest.ios.components.navigation :as nav]
     [com.rpl.specter :as sp]
     [re-frame.middleware :as mid]
@@ -12,7 +11,8 @@
     [rnntest.utils :as u]
     [clojure.string :as str]
     [rnntest.api :as api]
-    [re-frame.core :as rf]))
+    [re-frame.core :as rf]
+    [medley.core :as m]))
 
 ;; -- Middleware ------------------------------------------------------------
 ;;
@@ -87,7 +87,7 @@
 (register-handler
   :images-res
   basic-mw
-  (s/fn [db [{:keys [images]} category replace?]]
+  (s/fn [db [images category replace?]]
     (let [f (if replace? (constantly images) #(concat % images))]
       (-> db
           (update-in [:images-query :images] f)
@@ -107,7 +107,9 @@
     (let [query-params (cond-> (merge cfg/default-catapi-params
                                       {:results-per-page (get-in db [:images-query :per-page])})
                                (not (nil? req-category)) (assoc :category (:name req-category)))]
-      (api/fetch! :images query-params {:handler #(rf/dispatch [:images-res % req-category replace?])})
+      (api/fetch! :images query-params {:handler
+                                        #(rf/dispatch [:images-res (-> % :images)
+                                                       req-category replace?])})
       (assoc-in db [:images-query :loading?] true))))
 
 (register-handler
@@ -127,12 +129,36 @@
     (assoc db :random-fact (first facts))))
 
 (register-handler
-  :image-favoite
+  :image-favorite
   basic-mw
-  (s/fn [db [image-id]]
+  (s/fn [db [{:keys [id] :as image} unfavorite?]]
     (api/fetch! :favorite (merge cfg/default-catapi-params
                                  {:sub-id   (get-in db [:user :username])
-                                  :image-id image-id})
+                                  :image-id (:id image)
+                                  :action   (if unfavorite? "remove" "add")})
                 {:handler #(println %)})
-    (rf/dispatch [:nav/pop])
-    db))
+    (let [f (if unfavorite?
+              (partial remove #(= (:id %) id))
+              #(conj % image))]
+      (-> db
+          (assoc-in [:image-selected :favorite?] (not unfavorite?))
+          (update-in [:favorites-query :images] f)))))
+
+
+(register-handler
+  :favorites-load
+  basic-mw
+  (s/fn [db]
+    (let [query-params (cond-> (merge cfg/default-catapi-params
+                                      {:sub-id (get-in db [:user :username])}))]
+      (api/fetch! :favorites query-params
+                  {:handler #(rf/dispatch [:favorites-res (-> % :images)])})
+      (assoc-in db [:favorites-query :loading?] true))))
+
+(register-handler
+  :favorites-res
+  basic-mw
+  (s/fn [db [images]]
+    (-> db
+        (assoc-in [:favorites-query :images] (pf/look images))
+        (assoc-in [:favorites-query :loading?] false))))

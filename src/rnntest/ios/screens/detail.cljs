@@ -8,7 +8,8 @@
 (declare styles)
 
 (def close-icon (js/require "./images/close.png"))
-(def star-icon (js/require "./images/star_selected.png"))
+(def star-icon (js/require "./images/star.png"))
+(def star-icon-full (js/require "./images/star_selected.png"))
 
 (defn btn-icon [icon on-press tint-color]
   [ui/touchable-opacity
@@ -25,13 +26,14 @@
       (fn []
         (let [detail (rf/subscribe [:detail])
               {:keys [image-selected random-fact]} @detail
-              {:keys [url source-url id]} image-selected]
+              {:keys [url source-url id favorite?] :as image} image-selected]
           [ui/scroll-view
            {:style (:container styles)}
            [ui/view
             {:style (:buttons-wrap styles)}
             [btn-icon close-icon #(rf/dispatch [:nav/pop]) :white]
-            [btn-icon star-icon #(rf/dispatch [:image-favoite id]) :yellow700]]
+            [btn-icon (if favorite? star-icon-full star-icon)
+             #(rf/dispatch [:image-favorite image favorite?]) :yellow700]]
            [ui/scroll-view
             {:maximum-zoom-scale 2.5}
             [ui/image-progress

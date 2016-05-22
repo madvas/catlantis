@@ -18,7 +18,8 @@
 (def empty-state {:rendered             empty-render-state
                   :render-queue         empty-render-state
                   :registered-screens   {}
-                  :first-screen-render? false})
+                  :first-screen-render? false
+                  :navigator-style      {}})
 
 (def default-drawer-state {:to :closed})
 
@@ -67,20 +68,21 @@
   {:rendered             RenderedState
    :render-queue         RenderQueue
    :registered-screens   {s/Keyword NavScreenConfig}
-   :first-screen-render? s/Bool})
+   :first-screen-render? s/Bool
+   :navigator-style      {s/Any s/Any}})
 
 (s/defschema NavStateAtom (s/atom NavState))
 
 (s/defschema NavInitConfig
-  {(o :use-last-nav-state?) s/Bool
-   (o :screen)              (s/cond-pre s/Keyword NavScreenConfig)
-   (o :drawer)              {(s/enum :left :right) {s/Any s/Any}}
-   s/Any                    s/Any})
+  {(o :persist-state?) s/Bool
+   (o :screen)         (s/cond-pre s/Keyword NavScreenConfig)
+   (o :drawer)         {(s/enum :left :right) {s/Any s/Any}}
+   s/Any               s/Any})
 
 (def app-default-config
-  {:navigator-style {:nav-bar-blur       true
-                     ;:nav-bar-translucent true
-                     :draw-under-nav-bar true}})
+  {} #_{:navigator-style {:nav-bar-blur       true
+                          ;:nav-bar-translucent true
+                          :draw-under-nav-bar true}})
 
 (defn get-nav-state []
   @*nav-state*)
@@ -109,6 +111,22 @@
 (s/defn assoc-nav-stack-top-cfg! [nav-state-atom k v]
   (update-nav-stack-top! nav-state-atom #(assoc-in % [:config k] v)))
 
+(defn registered-cfg [screen-name]
+  (get-in @*nav-state* [:registered-screens screen-name]))
+
+(s/defn merge-with-default-cfg
+  ([config :- NavScreenConfig]
+    (merge-with-default-cfg (:screen config) config))
+  ([screen-name :- s/Keyword
+    config :- NavScreenConfigNoName]
+    (let [nav-style (apply merge
+                           (map :navigator-style
+                                [@*nav-state* (registered-cfg screen-name) config]))]
+      (merge (registered-cfg screen-name)
+             config
+             {:navigator-style nav-style}))))
+
+
 (declare render-queued-drawers!)
 (declare pop-render-queue!)
 (declare push-screen!)
@@ -118,9 +136,6 @@
 
 (s/defn has-render-queue? [nav-state :- NavState]
   (seq (-> nav-state :render-queue :nav-stack)))
-
-(defn registered-cfg [screen-name]
-  (get-in @*nav-state* [:registered-screens screen-name]))
 
 (s/defn get-top-navigator :- Navigator
   [rendered-state :- RenderedState]
@@ -135,7 +150,7 @@
   (r/create-class
     {:component-will-mount
      (fn [this]
-       (let [first-screen-render? (:first-screen-render? @*nav-state*)
+       (let [{:keys [first-screen-render?]} @*nav-state*
              props (:props (u/obj->hash-map this))
              navigator (:navigator props)
              screen-cfg (if (has-render-queue? @*nav-state*)
@@ -157,13 +172,13 @@
      (fn []
        [component])}))
 
+
 (defn register-reagent-component!
   ([screen-name component] (register-reagent-component! screen-name component nil))
   ([screen-name component config]
    (let [component (r/reactify-component component)]
      (when config
-       (doseq [field (-> (merge app-default-config config)
-                         u/walk-camelize-keys)]
+       (doseq [field (u/walk-camelize-keys config)]
          (aset component (name (key field)) (clj->js (val field)))))
      (register-component! (name screen-name) component))))
 
@@ -254,11 +269,13 @@
   (when (side drawer)
     {:drawers {side (merge default-drawer-state (side drawer))}}))
 
+
 (s/defn init-render-queue :- RenderQueue
   [{:keys [screen drawer]} :- NavInitConfig]
   (let [screen (if (keyword? screen) {:screen screen} screen)]
+    (println "BEFORE")
     (merge-with merge
-                {:nav-stack (list {:config (merge (registered-cfg (:screen screen)) screen)})}
+                {:nav-stack (list {:config (merge-with-default-cfg screen)})}
                 (init-drawer :left drawer)
                 (init-drawer :right drawer))))
 
@@ -269,14 +286,6 @@
   (update render-state :nav-stack
           (fn [nav-stack]
             (map #(dissoc % :navigator) nav-stack))))
-
-(s/defn merge-with-screen-defaults
-  ([config]
-    (merge-with-screen-defaults (:screen config) config))
-  ([screen-name :- s/Keyword
-    config :- NavScreenConfigNoName]
-    (merge (registered-cfg screen-name) config)))
-
 
 (defn screen-type->action [type add?]
   (let [f (if add? first second)]
@@ -301,8 +310,9 @@
   ([screen-name :- s/Keyword
     config :- (s/maybe NavScreenConfigNoName)
     no-anim? :- s/Bool]
-    (let [config (merge-with-screen-defaults screen-name (u/ensure-map config))
+    (let [config (merge-with-default-cfg screen-name (u/ensure-map config))
           action-name (screen-name->action-name config true)]
+      (println "ACTION")
       (u/timeout-if
         (and (= action-name :show-light-box)                ; Lightbox won't show when we dismiss and show
              (has-render-queue? @*nav-state*))              ; instantly
@@ -311,6 +321,8 @@
           (:screen config)
           (-> (u/apply-if no-anim? with-no-anim config)
               (assoc :pass-props {:config config}))) 500))))
+
+
 
 (s/defn pop-screen!
   ([] (pop-screen! {} false))
@@ -345,18 +357,19 @@
       (update :nav-stack reverse)))
 
 (s/defn start-single-screen-app!
-  [{:keys [use-last-nav-state?] :as init-cfg} :- NavInitConfig]
-  (let [render-queue (if (and use-last-nav-state? (has-rendered? @*nav-state*))
+  [{:keys [persist-state? navigator-style] :as init-cfg} :- NavInitConfig]
+  (let [render-queue (if (and persist-state? (has-rendered? @*nav-state*))
                        (-> @*nav-state* :rendered rendered->render-queue)
                        (init-render-queue init-cfg))
         screen-cfg (-> render-queue :nav-stack first :config)]
     (swap! *nav-state* assoc
            :render-queue render-queue
            :rendered empty-render-state
-           :first-screen-render? true)
+           :first-screen-render? true
+           :navigator-style (u/ensure-map navigator-style))
     (.startSingleScreenApp Navigation
                            (-> init-cfg
-                               (assoc :screen screen-cfg)
+                               (assoc :screen (merge-with-default-cfg screen-cfg))
                                u/clj->camel->js))))
 
 (defn start-tab-based-app! [config]                         ; Not yet implemented

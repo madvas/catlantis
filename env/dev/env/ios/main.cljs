@@ -8,12 +8,13 @@
 (enable-console-print!)
 (aset js/console "disableYellowBox" true)
 
-(def home (:component home/home-screen))
+(def home (:component home/home))
 
 (def cnt (r/atom 0))
 (defn reloader []
   @cnt
   [home])
+
 
 (def root-el (r/as-element [reloader]))
 
@@ -23,8 +24,7 @@
   :jsload-callback (fn []
                      (u/clear-console!)
                      (core/init-nav)
-                     (swap! cnt inc)
-                     ))
+                     (swap! cnt inc)))
 
 (u/clear-console!)
 (core/init)

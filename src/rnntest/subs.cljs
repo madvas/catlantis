@@ -4,7 +4,8 @@
             [rnntest.api :as api]
             [rnntest.config :as cfg]
             [re-frame.core :as rf]
-            [print.foo :as pf :include-macros true]))
+            [print.foo :as pf :include-macros true]
+            [clojure.string :as str]))
 
 (register-sub
   :get-greeting
@@ -28,7 +29,6 @@
     (reaction
       (:category-selected @db))))
 
-
 (register-sub
   :images
   (fn [db [_ req-category]]
@@ -41,9 +41,21 @@
           (do (rf/dispatch-sync [:images-load req-category (not= category req-category)])
               [nil loading?]))))))
 
+(register-sub
+  :favorites
+  (fn [db _]
+    (reaction
+      (let [{:keys [images loading?]} (:favorites-query @db)]
+        [images loading?]))))
 
 (register-sub
   :detail
   (fn [db _]
     (reaction
-      (select-keys @db [:image-selected :random-fact]))))
+      (let [{:keys [image-selected random-fact favorites-query]} @db]
+        {:image-selected
+         (assoc image-selected :favorite? (contains? (->> (:images favorites-query)
+                                                          (map :id)
+                                                          set) (:id image-selected)))
+         :random-fact
+         random-fact}))))

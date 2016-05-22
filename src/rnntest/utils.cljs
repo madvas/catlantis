@@ -5,6 +5,8 @@
             [camel-snake-kebab.core :as cs :include-macros true]
             [clojure.walk :as w]))
 
+(set! js/React (js/require "react-native"))
+
 (def js->cljk #(js->clj % :keywordize-keys true))
 (def e-style-sheet (aget (js/require "react-native-extended-stylesheet") "default"))
 
@@ -18,7 +20,6 @@
 (build-stylesheet
   {:screenWidth  (:width window)
    :screenHeight (:height window)})
-
 
 (defn function? [x]
   (or (= js/Function (type x))
@@ -87,3 +88,7 @@
   (if pred?
     (js/setTimeout f t)
     (f)))
+
+(defn ids->keys [coll]
+  (into {} (for [item coll]
+             {(:id item) item})))
