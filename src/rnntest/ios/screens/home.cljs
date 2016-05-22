@@ -6,11 +6,14 @@
             [reagent.core :as r]
             [print.foo :as pf :include-macros true]
             [rnntest.config :refer [app-name]]
-            [rnntest.ios.components.navigation :as nav]))
+            [rnntest.ios.components.navigation :as nav]
+            [rnntest.config :as cfg]))
 
 (declare styles)
 
+(def star-icon (js/require "./images/star.png"))
 (def list-view-ds (ds/data-source {:rowHasChanged #(not= %1 %2)}))
+(def nav-content-color (u/color :deep-orange500))
 
 (defn render-image [{:keys [url source-url id] :as image}]
   [ui/touchable-opacity
@@ -46,24 +49,28 @@
                            :on-end-reached (partial on-end-reached @ctg)
                            :style          (:container styles)
                            :render-footer  (comp r/as-element (partial footer loading?))
-                           }])
-          ))})
-   :nav-config
+                           }])))})
+   :config
    {:screen            :home
     :screen-type       :screen
-    :title             "Home"
+    :title             cfg/app-name
     :navigator-buttons {:right-buttons
-                        [{:title "Right"
-                          :id    :some-screen}]
+                        [{:id   :favorites
+                          :icon star-icon}]
                         :left-buttons
                         [{:icon (js/require "./images/navicon_menu.png")
-                          :id   :menu}]}}
+                          :id   :menu}]}
+    :navigator-style   {:nav-bar-blur         true
+                        ;:nav-bar-translucent true
+                        :draw-under-nav-bar   true
+                        :nav-bar-button-color nav-content-color
+                        :nav-bar-text-color   nav-content-color}}
    :on-navigator-event-fn
-   (fn [registered-screens navigator {:keys [id]}]
+   (fn [{:keys [id]}]
      (case (keyword id)
-       :menu (rf/dispatch [:nav/toggle-drawer navigator {:animated true}])
-       (rf/dispatch [:nav/push navigator (get registered-screens
-                                              (keyword id))])))})
+       :menu (rf/dispatch [:nav/toggle-drawer])
+       #_(rf/dispatch [:nav/push screen-name (get registered-screens
+                                                  (keyword id))])))})
 
 (def styles
   (u/create-stylesheet

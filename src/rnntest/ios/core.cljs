@@ -15,18 +15,14 @@
 
 (s/set-fn-validation! true)
 
-
-
 (defn init-nav []
-  (let [nav-state (subscribe [:nav/state])]
-    (println ":init-nav" @nav-state)
-    (nav/register-screen! home/home-screen)
-    (nav/register-screen! detail/detail)
-    (nav/register-reagent-component! :categories categories/categories)
-    (nav/apply-nav-state-on-next-mount! @nav-state)
-    (nav/start-single-screen-app! {:screen        (last (:nav-stack @nav-state))
-                                   :drawer        {:left {:screen :categories}}
-                                   :animationType :fade})))
+  (nav/register-screen! home/home-screen)
+  (nav/register-screen! detail/detail)
+  (nav/register-reagent-component! :categories categories/categories)
+  (nav/start-single-screen-app! {:screen              {:screen :home}
+                                 :drawer              {:left {:screen :categories}}
+                                 :use-last-nav-state? true
+                                 :animationType       :fade}))
 
 
 (defn init []

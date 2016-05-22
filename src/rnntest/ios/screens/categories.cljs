@@ -9,15 +9,15 @@
 
 (declare styles)
 
-(defn on-categ-press [ctg navigator]
+(defn on-categ-press [ctg]
   (rf/dispatch [:category-select ctg])
-  (rf/dispatch [:nav/toggle-drawer navigator]))
+  (rf/dispatch [:nav/toggle-drawer]))
 
 (def no-category
   {:name "All"
    :id   0})
 
-(defn categories [{:keys [navigator]}]
+(defn categories []
   (let [catgs (rf/subscribe [:categories])
         {:keys [container]} styles]
     [ui/view
@@ -27,7 +27,7 @@
        [ui/list-item {:text           (s/capitalize name)
                       :style          (:list-item styles)
                       :style-text     (:list-item-text styles)
-                      :on-press       (partial on-categ-press ctg navigator)
+                      :on-press       (partial on-categ-press ctg)
                       :key            id
                       :underlay-color (u/color :grey300)}])]))
 

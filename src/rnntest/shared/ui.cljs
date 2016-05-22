@@ -14,6 +14,7 @@
 (def activity-indicator-ios (r/adapt-react-class (.-ActivityIndicatorIOS js/React)))
 (def list-item (r/adapt-react-class (js/require "react-native-listitem")))
 (def image-progress (r/adapt-react-class (js/require "react-native-image-progress")))
+(def LinkingIOS (.-LinkingIOS js/React))
 
 (defn alert [title]
   (.alert (.-Alert js/React) title))
@@ -23,6 +24,9 @@
     (doseq [field statics]
       (aset component (name (key field)) (clj->js (val field))))
     component))
+
+(defn open-url [url]
+  (.openURL LinkingIOS url))
 
 (defn create-class-with-statics [spec]
   (-> (r/create-class spec)

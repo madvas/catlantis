@@ -7,29 +7,91 @@
 
 (declare styles)
 
+(def close-icon (js/require "./images/close.png"))
+(def star-icon (js/require "./images/star_selected.png"))
+
+(defn btn-icon [icon on-press tint-color]
+  [ui/touchable-opacity
+   {:on-press on-press
+    :style    (:close-btn styles)}
+   [ui/image
+    {:source icon
+     :style  {:tint-color (u/color tint-color)}}]])
+
 (def detail
   {:component
    (r/create-class
      {:reagent-render
       (fn []
-        (let []
-          [ui/scroll-view {:style (:container styles)}
-           [ui/text {:style (:text styles)} "Hola"]]))})
-   :nav-config
+        (let [detail (rf/subscribe [:detail])
+              {:keys [image-selected random-fact]} @detail
+              {:keys [url source-url id]} image-selected]
+          [ui/scroll-view
+           {:style (:container styles)}
+           [ui/view
+            {:style (:buttons-wrap styles)}
+            [btn-icon close-icon #(rf/dispatch [:nav/pop]) :white]
+            [btn-icon star-icon #(rf/dispatch [:image-favoite id]) :yellow700]]
+           [ui/scroll-view
+            {:maximum-zoom-scale 2.5}
+            [ui/image-progress
+             {:source      {:uri url}
+              :resize-mode :contain
+              :style       (:image-detail styles)}]]
+           [ui/view
+            {:style (:text-wrap styles)}
+            [ui/text
+             {:style (:image-text styles)}
+             random-fact]
+            [ui/text
+             {:on-press #(ui/open-url source-url)
+              :style    (:source-link styles)}
+             "Image Source"]]
+           ]))})
+   :config
    {:screen            :detail
-    :screen-type       :modal
+    :screen-type       :light-box
     :title             ""
     :navigator-buttons {:right-buttons []
-                        :left-buttons  [{:icon (js/require "./images/close.png")
-                                         :id   :close}]}}
-   :on-navigator-event-fn
-   (fn [screens navigator {:keys [id]}]
-     (case (keyword id)
-       :close (rf/dispatch [:nav/pop navigator])))})
+                        :left-buttons  [{:icon close-icon
+                                         :id   :close}]}
+    :style             {:background-blur #_"light" "dark"
+                        ;:background-color (u/color :black)}
+                        ;:navigator-style   {:draw-under-nav-bar false}
+                        }
+    #_:on-navigator-event-fn
+    #_(fn [{:keys [id]}]
+        (case (keyword id)
+          :close (rf/dispatch [:nav/pop])))}})
 
 (def styles
   (u/create-stylesheet
-    {:container {:flex             1
-                 :padding-top      80
-                 :background-color (u/color :amber500)}
-     :text      {:color "white" :text-align "center" :font-weight "bold"}}))
+    {:container    {:flex             1
+                    :background-color :transparent
+                    :flex-direction   :column}
+     :text         {:color "white" :text-align "center" :font-weight "bold"}
+     :image-detail {:flex       1
+                    :height     "60%"
+                    :width      "100%"
+                    :margin-top 20}
+     :buttons-wrap {:flex-direction  "row"
+                    :justify-content :space-between
+                    :margin-top      0
+                    :padding-left    20
+                    :padding-right   20}
+     :text-wrap    {:justify-content :center
+                    :align-items     :center
+                    :margin-top      20}
+     :source-link  {:text-align :right
+                    :color      (u/color :grey400)
+                    :width      "90%"
+                    :height     20
+                    :font-size  12}
+     :image-text   {:text-align :center
+                    :color      (u/color :white)
+                    :width      "90%"
+                    :height     "15%"
+                    ;:text-shadow-color  (u/color :black)
+                    ;:text-shadow-radius 1
+                    ;:text-shadow-offset {:width 0.5 :height 0.5}
+                    }}))

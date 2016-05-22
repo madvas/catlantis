@@ -30,6 +30,12 @@
       (apply f x args)
       x)))
 
+(defn apply-if-not [pred f x & args]
+  (let [pred (if (function? pred) pred (constantly pred))]
+    (if-not (pred x)
+      (apply f x args)
+      x)))
+
 (defn obj->hash-map [obj]
   (let [ks (js/Object.keys obj)]
     (reduce #(assoc %1 (keyword %2) (js->clj (aget obj %2) :keywordize-keys true)) {} ks)))
@@ -59,5 +65,25 @@
                            (symbol? %)
                            (keyword? %)) cs/->camelCase) m))
 
+(defn walk-kebabize-keys [m]
+  (walk-keys (partial apply-if
+                      #(or (string? %)
+                           (symbol? %)
+                           (keyword? %)) cs/->kebab-case) m))
+
+(defn keywordize-map-vals-at [m & ks]
+  (into {} (for [[k v] m]
+             {(if (contains? (set ks) k) (keyword? k) k) v})))
+
+(defn ensure-map [x]
+  (if (seq x) x {}))
+
+(defn opposite [x first-opt second-opt]
+  (if (= x first-opt) second-opt first-opt))
+
 (def clj->camel->js (comp clj->js walk-camelize-keys))
 
+(defn timeout-if [pred? f t]
+  (if pred?
+    (js/setTimeout f t)
+    (f)))

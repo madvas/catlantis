@@ -52,7 +52,9 @@
       (GET url (merge default-opts
                       opts
                       {:params (m/map-keys cs/->snake_case query-params)}
-                      {:handler (comp (:handler opts) parse-xml-response)})))))
+                      {:handler (comp (:handler opts) (if-not (:response-format opts)
+                                                        parse-xml-response
+                                                        identity))})))))
 
 
 (comment

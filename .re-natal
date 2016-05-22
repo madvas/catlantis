@@ -13,10 +13,6 @@
     "react-native-extended-stylesheet",
     "react-native-listitem",
     "stream",
-    "xml2js",
-    "events",
-    "timers",
-    "buffer",
     "react-native-image-progress"
   ],
   "imageDirs": [

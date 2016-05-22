@@ -13,12 +13,6 @@
       (get @db :greeting))))
 
 (register-sub
-  :nav/state
-  (fn [db _]
-    (reaction
-      (get @db :nav/state))))
-
-(register-sub
   :categories
   (fn [db _]
     (reaction
@@ -42,7 +36,14 @@
       (let [{:keys [images loading? category]} (:images-query @db)]
         (if (or loading?
                 (and images
-                     (= category (pf/look req-category))))
+                     (= category req-category)))
           [images loading?]
           (do (rf/dispatch-sync [:images-load req-category (not= category req-category)])
               [nil loading?]))))))
+
+
+(register-sub
+  :detail
+  (fn [db _]
+    (reaction
+      (select-keys @db [:image-selected :random-fact]))))

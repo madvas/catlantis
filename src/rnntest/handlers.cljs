@@ -49,24 +49,24 @@
 (register-handler
   :nav/push
   basic-mw
-  (s/fn [db [navigator nav-config :- nav/NavScreenConfig]]
-    (nav/push-screen! navigator nav-config)
-    (update-in db [:nav/state :nav-stack] #(conj % nav-config))))
+  (s/fn [db [screen-name config]]
+    (nav/push-screen! screen-name config)
+    db))
 
 (register-handler
   :nav/pop
   basic-mw
-  (s/fn [db [navigator]]
-    (nav/pop-screen! navigator (first (:nav-stack (:nav/state db))))
-    (update-in db [:nav/state :nav-stack] pop)))
+  (s/fn [db]
+    (nav/pop-screen!)
+    db))
 
 
 (register-handler
   :nav/toggle-drawer
   basic-mw
-  (s/fn [db [navigator config]]
-    (nav/toggle-drawer! navigator config)
-    (update-in db [:nav/state :drawers :left :to] #(if (= % :open) :closed :open))))
+  (s/fn [db [config]]
+    (nav/toggle-drawer! config)
+    db))
 
 (register-handler
   :categories-res
@@ -81,10 +81,8 @@
     (let [category (if (= (:id category) 0) nil category)
           title (-> (str cfg/app-name (u/apply-if string? #(str " (" (str/capitalize %) ")")
                                                   (:name category))))]
-      (nav/set-title! :home {:title (pf/look title)})
-      (->> db
-           (sp/setval [:nav/state :nav-stack sp/FIRST :title] title)
-           (sp/setval [:category-selected] category)))))
+      (nav/set-title! title)
+      (assoc db :category-selected category))))
 
 (register-handler
   :images-res
@@ -112,9 +110,29 @@
       (api/fetch! :images query-params {:handler #(rf/dispatch [:images-res % req-category replace?])})
       (assoc-in db [:images-query :loading?] true))))
 
-
 (register-handler
   :image-selected
   basic-mw
   (s/fn [db [image]]
-    (nav/push-screen! :detail {})))
+    (api/fetch! :facts {:number 1} {:handler         #(rf/dispatch [:facts-res %])
+                                    :response-format :json
+                                    :keywords?       true})
+    (nav/push-screen! :detail)
+    (assoc db :image-selected image)))
+
+(register-handler
+  :facts-res
+  basic-mw
+  (s/fn [db [{:keys [facts]}]]
+    (assoc db :random-fact (first facts))))
+
+(register-handler
+  :image-favoite
+  basic-mw
+  (s/fn [db [image-id]]
+    (api/fetch! :favorite (merge cfg/default-catapi-params
+                                 {:sub-id   (get-in db [:user :username])
+                                  :image-id image-id})
+                {:handler #(println %)})
+    (rf/dispatch [:nav/pop])
+    db))
