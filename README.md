@@ -1,14 +1,28 @@
-# rnntest
+# Catlantis
 
-A Clojure library designed to ... well, that part is up to you.
+A simple [React-Native](https://facebook.github.io/react-native/) IOS app (about Cats!) written in [Clojurescript](https://github.com/clojure/clojurescript) using [re-natal](https://github.com/drapanjanas/re-natal) template.
 
-## Usage
+## How to run
+```
+$ npm i
+$ lein prod-build
+```
+Then run in iOS from xcode or android by `react-native run-android`
 
-FIXME
+## How to develop
+Catlantis is based on re-natal 0.2.34+.
+```
+$ re-natal use-figwheel
+$ lein figwheel ios
+```
+or nREPL
+```
+$ lein repl
+user=> (start-ios-fig)
+```
+and finally
+```
+$ react-native run-ios
+```
 
-## License
-
-Copyright © 2016 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Please, refer to [re-natal documentation](https://github.com/drapanjanas/re-natal/blob/master/README.md) for more information.

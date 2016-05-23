@@ -1,4 +1,4 @@
-rootProject.name = 'rnntest'
+rootProject.name = 'catlantis'
 
 include ':app'
 include ':react-native-navigation'

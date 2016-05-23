@@ -1,6 +1,6 @@
-(ns rnntest.core-test
+(ns catlantis.core-test
   (:require [clojure.test :refer :all]
-            [rnntest.core :refer :all]))
+            [catlantis.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

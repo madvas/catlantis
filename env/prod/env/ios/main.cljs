@@ -1,5 +1,5 @@
  (ns env.ios.main
-  (:require [rnntest.ios.core :as core]))
+  (:require [catlantis.ios.core :as core]))
 
  (core/init)
 

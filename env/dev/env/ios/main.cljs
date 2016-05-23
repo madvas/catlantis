@@ -1,9 +1,9 @@
 (ns ^:figwheel-no-load env.ios.main
   (:require [reagent.core :as r]
-            [rnntest.ios.core :as core]
+            [catlantis.ios.core :as core]
             [figwheel.client :as figwheel :include-macros true]
-            [rnntest.utils :as u]
-            [rnntest.ios.screens.home :as home]))
+            [catlantis.utils :as u]
+            [catlantis.ios.screens.home :as home]))
 
 (enable-console-print!)
 (aset js/console "disableYellowBox" true)
