@@ -4,7 +4,7 @@
             [re-frame.core :as rf]
             [reagent.core :as r]
             [print.foo :as pf :include-macros true]
-            [catlantis.ios.shared.navigation :as nav]
+            [catlantis.shared.navigation :as nav]
             [clojure.string :as s]))
 
 (declare styles)

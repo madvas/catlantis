@@ -1,6 +1,6 @@
 (defproject catlantis "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :url "ReactNative & Clojurescript App about Cats!"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
@@ -21,8 +21,9 @@
   :clean-targets ["target/" "index.ios.js" "index.android.js"]
   :aliases {"prod-build" ^{:doc "Recompile code with prod profile."}
                          ["do" "clean"
-                          ["with-profile" "prod" "cljsbuild" "once" "ios"]
-                          ["with-profile" "prod" "cljsbuild" "once" "android"]]}
+                          ["with-profile" "prod" "cljsbuild" "auto" "ios"]
+                          ;["with-profile" "prod" "cljsbuild" "once" "android"]
+                          ]}
   :profiles {:dev  {:dependencies [[figwheel-sidecar "0.5.0-6"]
                                    [com.cemerick/piggieback "0.2.1"]]
                     :source-paths ["src" "env/dev"]

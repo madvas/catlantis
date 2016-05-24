@@ -7,7 +7,7 @@ A simple [React-Native](https://facebook.github.io/react-native/) IOS app (about
 $ npm i
 $ lein prod-build
 ```
-Then run in iOS from xcode or android by `react-native run-android`
+Then run in iOS from xcode or `react-native run-ios`
 
 ## How to develop
 Catlantis is based on re-natal 0.2.34+.

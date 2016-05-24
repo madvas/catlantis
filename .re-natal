@@ -2,7 +2,7 @@
   "name": "catlantis",
   "interface": "reagent",
   "androidHost": "10.0.3.2",
-  "iosHost": "localhost",
+  "iosHost": "192.168.0.62",
   "envRoots": {
     "dev": "env/dev",
     "prod": "env/prod"
@@ -15,7 +15,8 @@
     "stream",
     "react-native-image-progress",
     "react-native-keyboard-spacer",
-    "apsl-react-native-button"
+    "apsl-react-native-button",
+    "dismissKeyboard"
   ],
   "imageDirs": [
     "images"

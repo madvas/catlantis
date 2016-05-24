@@ -14,10 +14,11 @@
   (not (re-matches #"^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$" username)))
 
 (defn on-submit [user screen-type]
-  (rf/dispatch [:user-change user])
-  (if (= screen-type :modal)
-    (rf/dispatch [:nav/pop])
-    (rf/dispatch [:nav/push :home])))
+  (when-not (invalid-username? (:username user))
+    (rf/dispatch [:user-change user])
+    (if (= screen-type :modal)
+      (rf/dispatch [:nav/pop])
+      (rf/dispatch [:nav/push :home]))))
 
 (def user
   {:component
@@ -30,25 +31,31 @@
       :reagent-render
       (fn [props]
         (this-as this
-          (let [{:keys [username]} (r/state this)]
+          (let [{:keys [username]} (r/state this)
+                sbmt (partial on-submit {:username username}
+                              (-> props :config :screen-type))]
             [ui/image
              {:source bg-img
               :style  (:bg-img styles)}
-             [ui/view {:style (:container styles)}
-              [ui/text-input
-               {:style                            (:input styles)
-                :blur-on-submit                   true
-                :on-change-text                   #(r/set-state this {:username (str/trim %)})
-                :value                            username
-                :placeholder                      "Username"
-                :enables-return-key-automatically true}]
-              [ui/button {:on-press    (partial on-submit {:username username}
-                                                (-> props :config :screen-type))
-                          :style       (:submit-btn styles)
-                          :text-style  (:submit-btn-text styles)
-                          :is-disabled (invalid-username? username)}
-               "Submit"]
-              [ui/keyboard-spacer {:animation-config (ui/anim-preset :spring)}]]])))})
+             [ui/touchable-without-feedback
+              {:on-press #(ui/dismiss-keyboard)}
+              [ui/view {:style (:container styles)}
+               [ui/text-input
+                {:style                            (:input styles)
+                 :blur-on-submit                   true
+                 :on-change-text                   #(r/set-state this {:username (str/trim %)})
+                 :default-value                    username
+                 :placeholder                      "Username"
+                 :enables-return-key-automatically true
+                 :auto-correct                     false
+                 :on-submit-editing                sbmt
+                 :auto-capitalize                  :none}]
+               [ui/button {:on-press    sbmt
+                           :style       (:submit-btn styles)
+                           :text-style  (:submit-btn-text styles)
+                           :is-disabled (invalid-username? username)}
+                "Submit"]
+               [ui/keyboard-spacer {:animation-config (ui/anim-preset :spring)}]]]])))})
    :config
    {:screen          :user
     :screen-type     :screen

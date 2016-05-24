@@ -36,10 +36,12 @@
              #(rf/dispatch [:image-favorite image favorite?]) :yellow700]]
            [ui/scroll-view
             {:maximum-zoom-scale 2.5}
-            [ui/image-progress
-             {:source      {:uri url}
-              :resize-mode :contain
-              :style       (:image-detail styles)}]]
+            [ui/touchable-opacity
+             {:on-press #(rf/dispatch [:nav/pop])}
+             [ui/image-progress
+              {:source      {:uri url}
+               :resize-mode :contain
+               :style       (:image-detail styles)}]]]
            [ui/view
             {:style (:text-wrap styles)}
             [ui/text

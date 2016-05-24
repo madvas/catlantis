@@ -4,20 +4,14 @@
     [schema.core :as s :include-macros true]
     [print.foo :as pf :include-macros true]
     [catlantis.db :refer [app-db schema]]
-    [catlantis.ios.shared.navigation :as nav]
-    [com.rpl.specter :as sp]
+    [catlantis.shared.navigation :as nav]
     [re-frame.middleware :as mid]
     [catlantis.config :as cfg]
-    [catlantis.utils :as u]
     [clojure.string :as str]
     [catlantis.api :as api]
-    [re-frame.core :as rf]
-    [medley.core :as m]))
+    [re-frame.core :as rf]))
 
-;; -- Middleware ------------------------------------------------------------
-;;
-;; See https://github.com/Day8/re-frame/wiki/Using-Handler-Middleware
-;;
+(.log js/console "here handler")
 (defn check-and-throw
   "throw an exception if db doesn't match the schema."
   [a-schema db]
@@ -25,19 +19,20 @@
     (throw (js/Error. (str "schema check failed: " problems)))))
 
 (def validate-schema-mw
-  (if goog.DEBUG
-    (after (partial check-and-throw schema))
-    []))
+  (when goog.DEBUG
+    (after (partial check-and-throw schema))))
 
-(def basic-mw (comp #_mid/debug mid/trim-v validate-schema-mw))
+(def basic-mw [#_mid/debug mid/trim-v validate-schema-mw])
 
-;; -- Handlers --------------------------------------------------------------
+(.log js/console "register init")
 
 (register-handler
   :initialize-db
   basic-mw
   (fn [_]
     app-db))
+
+(.log js/console "after register init")
 
 (register-handler
   :set-greeting

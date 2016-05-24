@@ -11,6 +11,7 @@
 (def image (r/adapt-react-class (.-Image js/React)))
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight js/React)))
 (def touchable-opacity (r/adapt-react-class (.-TouchableOpacity js/React)))
+(def touchable-without-feedback (r/adapt-react-class (.-TouchableWithoutFeedback js/React)))
 (def list-view (r/adapt-react-class (.-ListView js/React)))
 (def activity-indicator-ios (r/adapt-react-class (.-ActivityIndicatorIOS js/React)))
 (def text-input (r/adapt-react-class (.-TextInput js/React)))
@@ -19,6 +20,8 @@
 (def keyboard-spacer (r/adapt-react-class (js/require "react-native-keyboard-spacer")))
 (def button (r/adapt-react-class (js/require "apsl-react-native-button")))
 (def LinkingIOS (.-LinkingIOS js/React))
+(def dismiss-keyboard (js/require "dismissKeyboard"))
+
 
 (defn open-url [url]
   (.openURL LinkingIOS url))

@@ -1,6 +1,8 @@
- (ns env.ios.main
+(ns env.ios.main
   (:require [catlantis.ios.core :as core]))
 
- (core/init)
+(enable-console-print!)
+(aset js/console "disableYellowBox" true)
+(core/init)
 
 

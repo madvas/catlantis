@@ -22,7 +22,6 @@
 
 (def per-page 5)
 
-;; schema of app-db
 (def schema {:categories        [Category]
              :category-selected (s/maybe Category)
              :images-query      (merge ImagesQuery
@@ -33,15 +32,15 @@
              :random-fact       s/Str
              :user              (s/maybe User)})
 
-;; initial state of app-db
-(def app-db {:categories        [{:id nil :name "All Categories"}]
-             :category-selected nil
-             :images-query      {:images   nil
-                                 :per-page per-page
-                                 :loading? false
-                                 :category nil}
-             :favorites-query   {:images   nil
-                                 :loading? false}
-             :image-selected    nil
-             :random-fact       ""
-             :user              {:username "mada"}})
+(def app-db
+  {:categories        [{:id nil :name "All Categories"}]
+   :category-selected nil
+   :images-query      {:images   nil
+                       :per-page per-page
+                       :loading? false
+                       :category nil}
+   :favorites-query   {:images   nil
+                       :loading? false}
+   :image-selected    nil
+   :random-fact       ""
+   :user              {:username ""}})

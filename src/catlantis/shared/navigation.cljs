@@ -1,7 +1,4 @@
-;
-; I should probably complete this and make into a library ;)
-;
-(ns catlantis.ios.shared.navigation
+(ns catlantis.shared.navigation                             ; I should probably complete this and make into a library ;)
   (:refer-clojure :exclude [pop!])
   (:require-macros [print.foo :as pf])
   (:require [reagent.core :as r]
@@ -76,13 +73,11 @@
 (s/defschema NavInitConfig
   {(o :persist-state?) s/Bool
    (o :screen)         (s/cond-pre s/Keyword NavScreenConfig)
-   (o :drawer)         {(s/enum :left :right) {s/Any s/Any}}
+   (o :drawer)         {(o :left) (s/pred map?)
+                        (o :right) (s/pred map?)
+                        s/Any s/Any}
    s/Any               s/Any})
 
-(def app-default-config
-  {} #_{:navigator-style {:nav-bar-blur       true
-                          ;:nav-bar-translucent true
-                          :draw-under-nav-bar true}})
 
 (defn get-nav-state []
   @*nav-state*)
