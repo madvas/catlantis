@@ -1,6 +1,5 @@
 (ns catlantis.ios.screens.home
-  (:require [catlantis.utils :as u]
-            [re-frame.core :as rf]
+  (:require [re-frame.core :as rf]
             [reagent.core :as r]
             [print.foo :as pf :include-macros true]
             [catlantis.config :refer [app-name]]

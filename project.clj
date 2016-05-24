@@ -21,7 +21,7 @@
   :clean-targets ["target/" "index.ios.js" "index.android.js"]
   :aliases {"prod-build" ^{:doc "Recompile code with prod profile."}
                          ["do" "clean"
-                          ["with-profile" "prod" "cljsbuild" "auto" "ios"]
+                          ["with-profile" "prod" "cljsbuild" "once" "ios"]
                           ;["with-profile" "prod" "cljsbuild" "once" "android"]
                           ]}
   :profiles {:dev  {:dependencies [[figwheel-sidecar "0.5.0-6"]

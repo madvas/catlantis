@@ -1,5 +1,4 @@
-(ns catlantis.api-routes
-  (:require [bidi.bidi :as b]))
+(ns catlantis.api-routes)
 
 (def api-routes [""
                  {"http://thecatapi.com/api/"
@@ -13,8 +12,3 @@
                    "stats/getoverview" :overview}
                   "http://catfacts-api.appspot.com/api/facts"
                   :facts}])
-
-(comment
-  (b/path-for api-routes :categories)
-  (b/path-for api-routes :images)
-  (b/path-for api-routes :facts))

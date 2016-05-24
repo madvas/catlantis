@@ -2,7 +2,7 @@
   "name": "catlantis",
   "interface": "reagent",
   "androidHost": "10.0.3.2",
-  "iosHost": "192.168.0.62",
+  "iosHost": "localhost",
   "envRoots": {
     "dev": "env/dev",
     "prod": "env/prod"

@@ -4,8 +4,7 @@
             [catlantis.api :as api]
             [catlantis.config :as cfg]
             [re-frame.core :as rf]
-            [print.foo :as pf :include-macros true]
-            [clojure.string :as str]))
+            [print.foo :as pf :include-macros true]))
 
 (register-sub
   :get-greeting

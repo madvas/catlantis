@@ -1,6 +1,5 @@
 (ns catlantis.ios.screens.detail
   (:require [catlantis.shared.ui :as ui]
-            [catlantis.utils :as u]
             [re-frame.core :as rf]
             [print.foo :as pf :include-macros true]
             [reagent.core :as r]))
@@ -17,7 +16,7 @@
     :style    (:close-btn styles)}
    [ui/image
     {:source icon
-     :style  {:tint-color (u/color tint-color)}}]])
+     :style  {:tint-color (ui/color tint-color)}}]])
 
 (def detail
   {:component
@@ -62,7 +61,7 @@
     :style             {:background-blur "dark"}}})
 
 (def styles
-  (u/create-stylesheet
+  (ui/create-stylesheet
     {:container    {:flex             1
                     :background-color :transparent
                     :flex-direction   :column}
@@ -80,15 +79,11 @@
                     :align-items     :center
                     :margin-top      20}
      :source-link  {:text-align :right
-                    :color      (u/color :grey400)
+                    :color      (ui/color :grey400)
                     :width      "90%"
                     :height     20
                     :font-size  12}
      :image-text   {:text-align :center
-                    :color      (u/color :white)
+                    :color      (ui/color :white)
                     :width      "90%"
-                    :height     "15%"
-                    ;:text-shadow-color  (u/color :black)
-                    ;:text-shadow-radius 1
-                    ;:text-shadow-offset {:width 0.5 :height 0.5}
-                    }}))
+                    :height     "15%"}}))

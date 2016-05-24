@@ -1,7 +1,12 @@
 (ns catlantis.shared.ui
-  (:require-macros [natal-shell.layout-animation :as la])
+  (:require-macros [natal-shell.layout-animation :as la]
+                   [natal-shell.dimensions :as dim])
   (:require [reagent.core :as r]
-            [print.foo :as pf :include-macros true]))
+            [print.foo :as pf :include-macros true]
+            [medley.core :as m]
+            [catlantis.utils :as u]
+            [catlantis.colors :refer [colors]]
+            [camel-snake-kebab.core :as cs :include-macros true]))
 
 (set! js/window.React (js/require "react-native"))
 
@@ -21,7 +26,25 @@
 (def button (r/adapt-react-class (js/require "apsl-react-native-button")))
 (def LinkingIOS (.-LinkingIOS js/React))
 (def dismiss-keyboard (js/require "dismissKeyboard"))
+(def EStyleSheet (aget (js/require "react-native-extended-stylesheet") "default"))
 
+(defn get-window
+  ([] (get-window identity))
+  ([f]
+   (f (u/js->cljk (dim/get "window")))))
+
+(defn build-stylesheet
+  ([] (build-stylesheet {}))
+  ([vals]
+   (.build EStyleSheet (clj->js vals))))
+
+(defn create-stylesheet [styles]
+  (-> (m/map-vals #(u/apply-if map? (partial m/map-keys cs/->camelCase) %) styles)
+      clj->js
+      (->> (.create EStyleSheet))
+      u/obj->hash-map))
+
+(build-stylesheet)
 
 (defn open-url [url]
   (.openURL LinkingIOS url))
@@ -36,3 +59,5 @@
        (js->clj :keywordize-keys true)
        (merge override)
        clj->js)))
+
+(def color colors)

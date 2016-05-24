@@ -7,10 +7,8 @@
             [print.foo :as pf :include-macros true]
             [tubax.core :as tub]
             [clojure.walk :as w]
-            [clojure.zip :as z]
             [medley.core :as m]
-            [camel-snake-kebab.core :as cs :include-macros true]
-            [catlantis.config :as cfg]))
+            [camel-snake-kebab.core :as cs :include-macros true]))
 
 (s/defschema QueryParams {s/Keyword s/Any})
 
@@ -49,7 +47,6 @@
     opts]
     (let [url (b/path-for api-routes api-route)
           handler (get opts :handler identity)]
-      (println "FETCH " url)
       (GET url (merge default-opts
                       opts
                       {:params (m/map-keys cs/->snake_case query-params)}

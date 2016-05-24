@@ -1,11 +1,7 @@
 (ns catlantis.ios.screens.categories
   (:require [catlantis.shared.ui :as ui]
-            [catlantis.utils :as u]
             [re-frame.core :as rf]
-            [reagent.core :as r]
-            [print.foo :as pf :include-macros true]
-            [catlantis.shared.navigation :as nav]
-            [clojure.string :as s]))
+            [print.foo :as pf :include-macros true]))
 
 (declare styles)
 
@@ -25,10 +21,10 @@
                       :style-text     (:list-item-text styles)
                       :on-press       (partial on-categ-press ctg)
                       :key            id
-                      :underlay-color (u/color :grey300)}])]))
+                      :underlay-color (ui/color :grey300)}])]))
 
 (def styles
-  (u/create-stylesheet
+  (ui/create-stylesheet
     {:container      {:flex        1
                       :padding-top 40}
      :list-item      {:flex 1}

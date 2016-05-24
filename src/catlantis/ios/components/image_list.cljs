@@ -40,9 +40,9 @@
                      attrs)])))
 
 (def styles
-  (u/create-stylesheet
+  (ui/create-stylesheet
     {:container    {:flex             1
-                    :background-color (u/color :white)}
+                    :background-color (ui/color :white)}
      :text         {:color       "white"
                     :text-align  "center"
                     :font-weight "bold"}

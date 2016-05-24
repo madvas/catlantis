@@ -11,7 +11,6 @@
     [catlantis.api :as api]
     [re-frame.core :as rf]))
 
-(.log js/console "here handler")
 (defn check-and-throw
   "throw an exception if db doesn't match the schema."
   [a-schema db]
@@ -24,15 +23,11 @@
 
 (def basic-mw [#_mid/debug mid/trim-v validate-schema-mw])
 
-(.log js/console "register init")
-
 (register-handler
   :initialize-db
   basic-mw
   (fn [_]
     app-db))
-
-(.log js/console "after register init")
 
 (register-handler
   :set-greeting

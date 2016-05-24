@@ -1,6 +1,5 @@
 (ns catlantis.ios.screens.user
-  (:require [catlantis.utils :as u]
-            [re-frame.core :as rf]
+  (:require [re-frame.core :as rf]
             [reagent.core :as r]
             [print.foo :as pf :include-macros true]
             [catlantis.shared.ui :as ui]
@@ -64,7 +63,7 @@
 
 
 (def styles
-  (u/create-stylesheet
+  (ui/create-stylesheet
     {:bg-img          {:flex   1
                        :width  "100%"
                        :height "100%"}
@@ -73,16 +72,16 @@
                        :height           300
                        :justifyContent   :center}
      :input           {:height           50,
-                       :background-color (u/color :white)
+                       :background-color (ui/color :white)
                        :width            "75%"
                        :margin-bottom    5
                        :border-radius    6
                        :align-self       :center
                        :opacity          0.75
                        }
-     :submit-btn      {:background-color (u/color :cyan300)
+     :submit-btn      {:background-color (ui/color :cyan300)
                        :border-width     0
                        :width            "75%"
                        :opacity          0.9
                        :align-self       :center}
-     :submit-btn-text {:color (u/color :white)}}))
+     :submit-btn-text {:color (ui/color :white)}}))
